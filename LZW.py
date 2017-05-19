@@ -26,7 +26,7 @@ def compresser(buffer):
         else:
             convert_table[w + chr(c)] = count  # On attribut au mot un code > 255
             count += 1  # On incrémente le code
-            output += struct.pack("<H",convert_table[w]) # On ajoute le code du mot dans la sortie (sur 16 bits)
+            output += struct.pack("<H",convert_table[w]) # On ajoute le code du mot dans la sortie (sur 32 bits)
             w = chr(c)  # On reinitialise le mot avec le caractère courrant
     output+=struct.pack("<H",convert_table[w])
     return output
@@ -51,7 +51,8 @@ def decompresser(buffer):
             entree = w + w[0]                       # On défini la valeur
         else:  # Si le code est imprimable
             entree = chr(c)                         # Alors la valeur est la conversion ASCII du code
-        bytes_list.append(ord(entree))              # On ajoute à la bytes_list la valeur decodé
+        for carac in entree:
+            bytes_list.append(ord(carac))              # On ajoute à la bytes_list la valeur decodé
         # On reconstruit le dictionaire
         convert_table[count] = w + entree[0]
         count += 1
