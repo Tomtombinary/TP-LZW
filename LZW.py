@@ -13,11 +13,16 @@ def compresser(buffer):
     :param buffer: donnée à compresser de type bytes
     :raise: TypeError : si l'argument n'a pas le bon type
     :raise: BufferError : si le buffer ne peut pas être compressé
+                - Le buffer est vide
+                - Le buffer a besoin de plus de 65536 codes différents
     :return: un buffer de type bytes qui contient la représentation binaire des données compressées
     """
     # Verification des arguments
     if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
+
+    if len(buffer) <= 0:
+        raise BufferError("can't compress a empty buffer")
 
     output = b''
     convert_table = {}
@@ -58,8 +63,8 @@ def decompresser(buffer):
     if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
     # Verifie si le buffer a une taille pair (16 bits par code)
-    if len(buffer) % 2 != 0:
-        raise BufferError("a bytes object of pair length is required, actual length is %d" % len(buffer))
+    if len(buffer) % 2 != 0 or len(buffer) <= 0:
+        raise BufferError("a bytes object of pair length not null is required, actual length is %d" % len(buffer))
 
     convert_table = {}
     count = 256
