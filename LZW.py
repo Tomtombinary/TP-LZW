@@ -3,6 +3,7 @@
 
 import struct
 
+
 def compresser(buffer):
     """
     Compresse un fichier en utilisant l'algorithme LZW. L'algorithme utilise des codes sur 16 bits,
@@ -15,7 +16,7 @@ def compresser(buffer):
     :return: un buffer de type bytes qui contient la représentation binaire des données compressées
     """
     # Verification des arguments
-    if not isinstance(buffer,bytes):
+    if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
 
     output = b''
@@ -33,14 +34,15 @@ def compresser(buffer):
             w = w + chr(c)  # On met à jour le mot en ajoutant le caractère suivant
         # Sinon
         else:
-            convert_table[w + chr(c)] = count            # On attribut au mot un code > 255
-            count += 1                                   # On incrémente le code
+            convert_table[w + chr(c)] = count  # On attribut au mot un code > 255
+            count += 1  # On incrémente le code
             if count >= 65536:
                 raise BufferError("buffer can't be compressed, it need more than 65536 different code")
-            output += struct.pack("<H",convert_table[w]) # On ajoute le code du mot dans la sortie (sur 16 bits)
-            w = chr(c)                                   # On reinitialise le mot avec le caractère courrant
-    output+=struct.pack("<H",convert_table[w])
+            output += struct.pack("<H", convert_table[w])  # On ajoute le code du mot dans la sortie (sur 16 bits)
+            w = chr(c)  # On reinitialise le mot avec le caractère courrant
+    output += struct.pack("<H", convert_table[w])
     return output
+
 
 def decompresser(buffer):
     """
@@ -53,7 +55,7 @@ def decompresser(buffer):
     :return: un buffer de type bytes qui contient  les données décompressés.
     """
     # Verification des arguments
-    if not isinstance(buffer,bytes):
+    if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
     # Verifie si le buffer a une taille pair (16 bits par code)
     if len(buffer) % 2 != 0:
@@ -62,31 +64,27 @@ def decompresser(buffer):
     convert_table = {}
     count = 256
     bytes_list = []
-    c = struct.unpack("<H",buffer[0:2])[0]          # Premier caractère
+    c = struct.unpack("<H", buffer[0:2])[0]  # Premier caractère
     # Le premier code est forcement un caractère sinon le buffer ne peut pas être décompresser
     if c >= 256:
         raise BufferError("malformed bytes object")
 
-    w = chr(c)                                      # Décode le premier caractère
-    bytes_list.append(c)                            # On sort le premier caractère
-    for i in range(2, len(buffer), 2):              # Pour chaque caractère
-        c = struct.unpack("<H",buffer[i:i+2])[0]    # Recupère le code
-        if c > 255 and c in convert_table:          # Si le code n'est pas imprimable mais défini dans le convert_table
-            entree = convert_table[c]               # On récupère la valeur correspondante dans le dico
-        elif c > 255 and c not in convert_table:    # Si le code n'est pas imprimable et non défini dans le convert_table
-            entree = w + w[0]                       # On défini la valeur
+    w = chr(c)  # Décode le premier caractère
+    bytes_list.append(c)  # On sort le premier caractère
+    for i in range(2, len(buffer), 2):  # Pour chaque caractère
+        c = struct.unpack("<H", buffer[i:i + 2])[0]  # Recupère le code
+        if c > 255 and c in convert_table:  # Si le code n'est pas imprimable mais défini dans le convert_table
+            entree = convert_table[c]  # On récupère la valeur correspondante dans le dico
+        # Si le code n'est pas imprimable et non défini dans le convert_table
+        elif c > 255 and c not in convert_table:
+            entree = w + w[0]  # On défini la valeur
         else:  # Si le code est imprimable
-            entree = chr(c)                         # Alors la valeur est la conversion ASCII du code
+            entree = chr(c)  # Alors la valeur est la conversion ASCII du code
         for carac in entree:
-            bytes_list.append(ord(carac))           # On ajoute à la bytes_list la valeur decodé
+            bytes_list.append(ord(carac))  # On ajoute à la bytes_list la valeur decodé
         # On reconstruit le dictionaire
         convert_table[count] = w + entree[0]
         count += 1
         w = entree
 
     return bytes(bytes_list)
-
-
-
-
-

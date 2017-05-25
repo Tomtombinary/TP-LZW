@@ -3,18 +3,18 @@
 import unittest
 from LZW import *
 
-class MyTestCase(unittest.TestCase):
 
+class MyTestCase(unittest.TestCase):
     def test_compress_decompress(self):
-        data,decompressed_data = self.TesterFichier("test1.bin","compress1.lzm","result1.bin")
+        data, decompressed_data = self.TesterFichier("test1.bin", "compress1.lzm", "result1.bin")
         self.assertEqual(data, decompressed_data)
 
     def test_compress_decompress_loremipsum(self):
-        data,decompressed_data = self.TesterFichier("test2.txt","compress2.lzm","result2.txt")
+        data, decompressed_data = self.TesterFichier("test2.txt", "compress2.lzm", "result2.txt")
         self.assertEqual(data, decompressed_data)
 
     def test_compress_decompress_image(self):
-        data,decompressed_data = self.TesterFichier("test3.jpeg","compress3.lzm","result3.jpeg")
+        data, decompressed_data = self.TesterFichier("test3.jpeg", "compress3.lzm", "result3.jpeg")
         self.assertEqual(data, decompressed_data)
 
     def test_compress_decompress_bmp(self):
@@ -23,12 +23,12 @@ class MyTestCase(unittest.TestCase):
 
     def test_compress_decompress_random(self):
         data, decompressed_data = self.TesterFichier("test5.random", "compress5.lzm", "result5.random")
-        self.assertEqual(data,decompressed_data)
+        self.assertEqual(data, decompressed_data)
 
-    def TesterFichier(self,tfname,cfname,rfname):
-        test_filename = "tests/"+tfname
-        compress_filename = "tests/"+cfname
-        result_filename = "tests/"+rfname
+    def TesterFichier(self, tfname, cfname, rfname):
+        test_filename = "tests/" + tfname
+        compress_filename = "tests/" + cfname
+        result_filename = "tests/" + rfname
 
         clair = open(test_filename, "rb")
         data = clair.read()
@@ -47,7 +47,8 @@ class MyTestCase(unittest.TestCase):
         resultat.write(decompressed_data)
         resultat.close()
 
-        return (data,decompressed_data)
+        return (data, decompressed_data)
+
 
 if __name__ == '__main__':
     unittest.main()
