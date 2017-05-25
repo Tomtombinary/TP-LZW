@@ -42,12 +42,12 @@ class MyTestCase(unittest.TestCase):
         compressed_data = archive.read()
         archive.close()
 
-        resultat = open(result_filename, "wb")
+        result = open(result_filename, "wb")
         decompressed_data = decompresser(compressed_data)
-        resultat.write(decompressed_data)
-        resultat.close()
+        result.write(decompressed_data)
+        result.close()
 
-        return (data, decompressed_data)
+        return data, decompressed_data
 
 
 if __name__ == '__main__':
