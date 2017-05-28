@@ -8,7 +8,18 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 class MainWindow(Frame):
+    """
+    Fenetre principale hérite de la classe Frame
+    """
+
     def __init__(self, fenetre, **kwargs):
+        """
+        Constructeur de la fenêtre, créer les boutons pour choisir, compresser,
+        décompresser un fichier
+
+        :param fenetre: la fenêtre parent
+        :param kwargs: les arguments a passé en plus au constructeur de la classe Frame
+        """
         Frame.__init__(self, fenetre, width=800, height=600, **kwargs)
         self.pack(fill=BOTH)
 
@@ -25,6 +36,11 @@ class MainWindow(Frame):
         self._button_decompresser.pack(fill=X)
 
     def select_source(self):
+        """
+        Action effectuée lorsque l'utilisateur clique sur le bouton "Choisir un fichier"
+        Une fenêtre permet de choisir le fichier à compresser/décompresser
+        Le label se met à jour en fonction du choix de l'utilisateur
+        """
         self._filename_src = filedialog.askopenfilename()
         if os.path.isfile(self._filename_src):
             self._label_source['text'] = self._filename_src
@@ -32,6 +48,11 @@ class MainWindow(Frame):
             self._label_source['text'] = "Chemin source"
 
     def action_compresser(self):
+        """
+        Action effectuée lorsque l'utilisateur clique sur le bouton "Compresser"
+        Une fenêtre permet de nommer le fichier à sauvegarder.
+        Ensuite le fichier choisi devient le fichier compressé, le label se met à jour en conséquence
+        """
         self._filename_dest = filedialog.asksaveasfilename(defaultextension=".lzm",filetypes=(('Archive LZW','.lzw'),))
         if os.path.isfile(self._filename_src):
             if self._filename_dest != "":
@@ -52,6 +73,11 @@ class MainWindow(Frame):
             messagebox.showerror("Erreur","Merci de choisir le fichier à compresser/decompresser")
 
     def action_decompresser(self):
+        """
+        Action effectuée lorsque l'utilisateur clique sur le bouton "Décompresser"
+        Une fenêtre permet de nommer le fichier à sauvergarder
+        Ensuite le fichier choisi devient le fichier décompressé, le label se met à jour en conséquence
+        """
         self._filename_dest = filedialog.asksaveasfilename()
         if os.path.isfile(self._filename_src):
             if self._filename_dest != "":
