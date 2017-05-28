@@ -32,6 +32,7 @@ def test_compress_decompress(buffer):
     except BufferError:
         pass
 
+
 @given(st.binary(min_size=None,max_size=1000))
 def test_decompress_only(buffer):
     """
