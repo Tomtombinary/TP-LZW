@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 
-import struct
-
 
 def compresser(buffer,coding_size=2):
     """
@@ -46,7 +44,7 @@ def compresser(buffer,coding_size=2):
                 raise BufferError("buffer can't be compressed, it need more than 65536 different code")
             output += convert_table[w].to_bytes(coding_size,'little')
             w = chr(c)  # On reinitialise le mot avec le caractère courrant
-    output += struct.pack("<H", convert_table[w])
+    output += convert_table[w].to_bytes(coding_size,'little')
     return output
 
 
