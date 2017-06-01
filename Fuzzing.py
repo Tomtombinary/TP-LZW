@@ -14,7 +14,7 @@ from LZW import *
 from hypothesis import given, strategies as st
 
 
-@given(st.binary(min_size=None,max_size=1000))
+@given(st.binary(min_size=None,max_size=200))
 def test_compress_decompress(buffer):
     """
     Fuzz les fonctions de compression decompression avec des données aléatoire de type
@@ -33,7 +33,7 @@ def test_compress_decompress(buffer):
         pass
 
 
-@given(st.binary(min_size=None,max_size=1000))
+@given(st.binary(min_size=None,max_size=200))
 def test_decompress_only(buffer):
     """
     Fuzz la fonction de décompression avec des données aléatoire de type bytes.
