@@ -17,8 +17,8 @@ class MainWindow(Frame):
         Constructeur de la fenêtre, créer les boutons pour choisir, compresser,
         décompresser un fichier
 
-        :param fenetre: la fenêtre parent
-        :param kwargs: les arguments a passé en plus au constructeur de la classe Frame
+        @param fenetre: la fenêtre parent
+        @param kwargs: les arguments a passé en plus au constructeur de la classe Frame
         """
         Frame.__init__(self, fenetre, width=800, height=600, **kwargs)
         self.pack(fill=BOTH)
@@ -97,7 +97,7 @@ class MainWindow(Frame):
         else:
             messagebox.showerror("Erreur","Merci de choisir le fichier à compresser/decompresser")
 
-if __name__=='__main__':
+if __name__ == '__main__':
     window = Tk()
     interface = MainWindow(window)
     interface.mainloop()

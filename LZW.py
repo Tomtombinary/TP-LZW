@@ -2,9 +2,10 @@
 # -*- coding:utf-8 -*-
 
 from BitStream import *
+from math import *
 
 
-def compress(buffer, encoder=BitStream(12)):
+def compress(buffer):
     """
     Compresse un fichier en utilisant l'algorithme LZW. L'algorithme utilise des codes sur n bits selon l'encodeur,
     si les données nécessitent plus de 2**n codes différents pour être
@@ -19,7 +20,6 @@ def compress(buffer, encoder=BitStream(12)):
                 - le buffer a besoin de plus de 2**12 codes différents
     @return: un buffer de type bytes qui contient la représentation binaire des données compressées
     """
-    encoder.flush()
     # Verification des arguments
     if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
@@ -27,6 +27,7 @@ def compress(buffer, encoder=BitStream(12)):
     if len(buffer) <= 0:
         raise BufferError("can't compress a empty buffer")
 
+    code_list = []
     convert_table = {}
     count = 256
     # On initialise le convert_table avec les caractères présents
@@ -43,14 +44,22 @@ def compress(buffer, encoder=BitStream(12)):
         else:
             convert_table[w + chr(c)] = count  # On attribut au mot un code > 255
             count += 1  # On incrémente le code
-            encoder.write_code(convert_table[w])
+            code_list.append(convert_table[w])
             w = chr(c)  # On reinitialise le mot avec le caractère courrant
 
-    encoder.write_code(convert_table[w])
-    return encoder.to_bytes()
+    code_list.append(convert_table[w])
 
+    code_max = max(code_list)
+    if code_max >= 256:
+        nbits = int(ceil(log2(code_max)))
+    else:
+        nbits = 8
 
-def uncompress(buffer, decoder=BitStream(12)):
+    encoder = BitStream(nbits)
+    encoder.write_codes(code_list)
+    return nbits.to_bytes(4,'little') + encoder.to_bytes()
+
+def uncompress(buffer):
     """
     Décompresse un fichier en utilisant l'algorithme LZW avec des codes sur n bits selon le décodeur.
     @param buffer: un buffer en bytes qui contient la représentation binaire des données compressées
@@ -62,12 +71,17 @@ def uncompress(buffer, decoder=BitStream(12)):
                 - si le buffer est vide
     @return: un buffer de type bytes qui contient  les données décompressés.
     """
-    decoder.flush()
     # Verification des arguments
     if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
 
-    decoder.from_bytes(buffer)
+    if len(buffer) <= 4:
+        raise BufferError("invalid header")
+
+    nbits = int.from_bytes(buffer[0:4],'little')
+    decoder = BitStream(nbits)
+    decoder.from_bytes(buffer[4:])
+
     size = decoder.size_in_code()
 
     convert_table = {}

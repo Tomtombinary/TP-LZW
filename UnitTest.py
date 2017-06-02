@@ -8,18 +8,17 @@ import os
 class MyTestCase(unittest.TestCase):
     def test_compress_decompress(self):
         """
-        Test tout les fichiers dont le nom commence par test dans le
-        :return:
+        Test tout les fichiers dont le nom commence par test dans le répertoire test
         """
         for filename in os.listdir("tests/"):
             if filename.startswith("test"):
-                data, decompressed_data = self.TesterFichier(filename,"lzm_"+filename,"res_"+filename)
-                self.assertEqual(data, decompressed_data)
+                data, udata = self.TesterFichier(filename,"lzm_"+filename,"res_"+filename)
+                self.assertEqual(data, udata)
 
     def TesterFichier(self, tfname, cfname, rfname):
-        test_filename = "tests/" + tfname
-        compress_filename = "tests/" + cfname
-        result_filename = "tests/" + rfname
+        test_filename = os.path.join("tests",tfname) # Chemin sous Windows/Linux
+        compress_filename = os.path.join("tests",cfname)
+        result_filename = os.path.join("tests",rfname)
 
         clair = open(test_filename, "rb")
         data = clair.read()

@@ -1,6 +1,12 @@
 #!/usr/bin/python3
 #-*- coding:utf-8 -*-
 
+"""
+Module pour gèrer un flux de données encodée sur n bits
+@author : Tomtombinary
+@version : 1.0.0
+"""
+
 from math import *
 from copy import *
 
