@@ -59,7 +59,7 @@ class MainWindow(Frame):
                 try:
                     with open(self._filename_src,'rb') as source:
                         data = source.read()
-                        compressed_data = compresser(data)
+                        compressed_data = compress(data)
                         with open(self._filename_dest,'wb') as dest:
                             dest.write(compressed_data)
                         self._filename_src = self._filename_dest
@@ -84,7 +84,7 @@ class MainWindow(Frame):
                 try:
                     with open(self._filename_src,'rb') as source:
                         data = source.read()
-                        uncompressed_data = decompresser(data)
+                        uncompressed_data = uncompress(data)
                         with open(self._filename_dest,'wb') as dest:
                             dest.write(uncompressed_data)
                         self._filename_src = self._filename_dest

@@ -9,14 +9,10 @@ def main():
 
     parser = argparse.ArgumentParser(description='Compresse ou décompresse un fichier')
     parser.add_argument('filename',help='Fichier à compresser',type=str)
-    parser.add_argument('-e','--encode',help="Nombre d'octets pour encoder les codes (2 minimum)",default=2,type=int)
+    parser.add_argument('-e','--encode',help="Nombre de bits pour encoder les codes (12 bits par défaut)",default=12,type=int)
     parser.add_argument('-o','--output',help="Fichier de sortie",type=str)
     parser.add_argument('-d','--decompress',help="Décompresse le fichier",action='store_true')
     args = parser.parse_args()
-
-    if args.encode < 2:
-        print("2 octets minimum pour encoder")
-        exit(0)
 
     if not os.path.exists(args.filename):
         print("Le fichier n'existe pas")
@@ -28,10 +24,12 @@ def main():
         else:
             output_filename = args.filename + ".ulzm"
 
+    stream = BitStream(args.encode)
+
     if not args.decompress:
         with open(args.filename,'rb') as source:
             data = source.read()
-            cdata = compresser(data,coding_size=args.encode)
+            cdata = compress(data,encoder=stream)
             print("Fichier compressé à %d %%" % (100 * (1 - len(cdata) / len(data))))
             with open(output_filename,'wb') as dest:
                 dest.write(cdata)
@@ -39,7 +37,7 @@ def main():
         with open(args.filename,'rb') as source:
             data = source.read()
             try:
-                udata = decompresser(data,coding_size=args.encode)
+                udata = uncompress(data,decoder=stream)
                 with open(output_filename,'wb') as dest:
                     dest.write(udata)
             except BufferError:

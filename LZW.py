@@ -3,22 +3,23 @@
 
 from BitStream import *
 
-def compresser(buffer,coding_size=2):
-    """
-    Compresse un fichier en utilisant l'algorithme LZW. L'algorithme utilise des codes sur coding_size*8 bits,
-    et donc peut encoder 65536 codes différents, si les données nécessitent plus de 2**(coding_size*8) codes pour être
-    compressé la fonction lève une exception du type BufferError.
-    Les données compressées peuvent être plus lourd que les données originales, s'il y a peu d'octets qui se répètent.
-    :param buffer: donnée à compresser de type bytes
-    :param coding_size: nombre d'octets utilisés pour encoder un code
-    :raise: TypeError : si l'argument n'a pas le bon type
-    :raise: BufferError : si le buffer ne peut pas être compressé
-                - Le buffer est vide
-                - Le buffer a besoin de plus de 65536 codes différents
-    :return: un buffer de type bytes qui contient la représentation binaire des données compressées
-    """
-    encoder = BitStream(12)
 
+def compress(buffer, encoder=BitStream(12)):
+    """
+    Compresse un fichier en utilisant l'algorithme LZW. L'algorithme utilise des codes sur n bits selon l'encodeur,
+    si les données nécessitent plus de 2**n codes différents pour être
+    compressé la fonction lève une exception du type BitStreamError.
+    Les données compressées peuvent être plus lourd que les données originales, s'il y a peu d'octets qui se répètent.
+    @param buffer: donnée à compress de type bytes
+    @param encoder: précise l'encodage à utiliser (par défaut 12 bits)
+    @exception: TypeError : si l'argument n'a pas le bon type
+    @exception: BufferError : si le buffer ne peut pas être compressé
+                - Le buffer est vide
+    @exception: BitStreamErrorEncode :
+                - le buffer a besoin de plus de 2**12 codes différents
+    @return: un buffer de type bytes qui contient la représentation binaire des données compressées
+    """
+    encoder.flush()
     # Verification des arguments
     if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
@@ -26,7 +27,6 @@ def compresser(buffer,coding_size=2):
     if len(buffer) <= 0:
         raise BufferError("can't compress a empty buffer")
 
-    #output = b''
     convert_table = {}
     count = 256
     # On initialise le convert_table avec les caractères présents
@@ -43,46 +43,39 @@ def compresser(buffer,coding_size=2):
         else:
             convert_table[w + chr(c)] = count  # On attribut au mot un code > 255
             count += 1  # On incrémente le code
-            if count >= 2**(coding_size * 8):
-                raise BufferError("buffer can't be compressed, it need more than 65536 different code")
-            #output += convert_table[w].to_bytes(coding_size,'little')
             encoder.write_code(convert_table[w])
             w = chr(c)  # On reinitialise le mot avec le caractère courrant
-    #output += convert_table[w].to_bytes(coding_size,'little')
+
     encoder.write_code(convert_table[w])
     return encoder.to_bytes()
-    #return output
 
 
-def decompresser(buffer,coding_size=2):
+def uncompress(buffer, decoder=BitStream(12)):
     """
-    Décompresse un fichier en utilisant l'algorithme LZW avec des codes sur coding_size*8 bits.
-    :param buffer: un buffer en bytes qui contient la représentation binaire des données compressées
-    :param coding_size: nombre d'octets utilisés pour contenir un code
-    :raise: TypeError : si l'argument n'est pas un objet de type bytes
-    :raise: BufferError : si les données sont malformées, c'est-à-dire :
-                - s'il y'a un nombre impair d'octets
+    Décompresse un fichier en utilisant l'algorithme LZW avec des codes sur n bits selon le décodeur.
+    @param buffer: un buffer en bytes qui contient la représentation binaire des données compressées
+    @param decoder: précise le decoder à utiliser (par défaut 12 bits)
+    @exception TypeError : si l'argument n'est pas un objet de type bytes
+    @exception BufferError : si les données sont malformées, c'est-à-dire :
                 - si le premier code n'est pas un caractère
-    :return: un buffer de type bytes qui contient  les données décompressés.
+    @exception BitStreamErrorEOF :
+                - si le buffer est vide
+    @return: un buffer de type bytes qui contient  les données décompressés.
     """
+    decoder.flush()
     # Verification des arguments
     if not isinstance(buffer, bytes):
         raise TypeError("a bytes object is required, not '%s'" % type(buffer))
-    # Verifie si le buffer a une taille pair (16 bits par code)
-    #if len(buffer) % coding_size != 0 or len(buffer) <= 0:
-    #    raise BufferError("length must be divisible by %s and not null, actual length is %d" % (coding_size,len(buffer)))
 
-    encoder = BitStream(12)
-    encoder.from_bytes(buffer)
-    size = encoder.size_in_code()
+    decoder.from_bytes(buffer)
+    size = decoder.size_in_code()
 
     convert_table = {}
     count = 256
 
     bytes_list = []
 
-    #c = int.from_bytes(buffer[0:coding_size],'little')  # Premier caractère
-    c = encoder.read_code()
+    c = decoder.read_code()
 
     # Le premier code est forcement un caractère sinon le buffer ne peut pas être décompresser
     if c >= 256:
@@ -90,10 +83,8 @@ def decompresser(buffer,coding_size=2):
 
     w = chr(c)  # Décode le premier caractère
     bytes_list.append(c)  # On sort le premier caractère
-    #for i in range(coding_size, len(buffer),coding_size):  # Pour chaque caractère
     for i in range(0,size - 1):
-        #c = int.from_bytes(buffer[i:i + coding_size],'little') # Recupère le code
-        c = encoder.read_code()
+        c = decoder.read_code()
         if c > 255 and c in convert_table:  # Si le code n'est pas imprimable mais défini dans le convert_table
             entree = convert_table[c]  # On récupère la valeur correspondante dans le dico
         # Si le code n'est pas imprimable et non défini dans le convert_table

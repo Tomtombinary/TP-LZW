@@ -4,9 +4,21 @@
 from math import *
 from copy import *
 
-class BitStreamException(Exception):
+
+class BitStreamError(Exception):
     def __init__(self,message):
-        super(BitStreamException,self).__init__(message)
+        super(BitStreamError, self).__init__(message)
+
+
+class BitStreamErrorEOF(BitStreamError):
+    def __init__(self):
+        super(BitStreamErrorEOF, self).__init__("Error, stream end")
+
+
+class BitStreamErrorEncode(BitStreamError):
+    def __init__(self,code,nbits):
+        super(BitStreamErrorEncode,self).__init__("Error, code %d can't be encoded on %d bits" % (code,nbits))
+
 
 class BitStream:
     def __init__(self,nbits):
@@ -19,14 +31,14 @@ class BitStream:
 
     def write_code(self,code):
         if code >= 2 ** self._nbits:
-            raise BitStreamException("Error, code %d can't be encoded on %d bits" % (code, self._nbits))
+            raise BitStreamErrorEncode(code,self._nbits)
 
         for i in range(0, self._nbits):
             self._stream.append(bool((code >> i) & 1))
 
     def read_code(self):
         if len(self._stream) == 0:
-            raise BitStreamException("Error, stream end")
+            raise BitStreamErrorEOF()
 
         code = 0
         code_bits = self._stream[0:self._nbits]

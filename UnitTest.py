@@ -26,7 +26,7 @@ class MyTestCase(unittest.TestCase):
         clair.close()
 
         archive = open(compress_filename, "wb")
-        archive.write(compresser(data))
+        archive.write(compress(data))
         archive.close()
 
         archive = open(compress_filename, "rb")
@@ -34,7 +34,7 @@ class MyTestCase(unittest.TestCase):
         archive.close()
 
         result = open(result_filename, "wb")
-        decompressed_data = decompresser(compressed_data)
+        decompressed_data = uncompress(compressed_data)
         result.write(decompressed_data)
         result.close()
 
