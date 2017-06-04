@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 
+"""
+Outil en ligne de commande pour compresser/decompresser un fichier
+en utilisant l'algorithme LZW.
+@author: Thomas Dubier
+@author: Pol Kramarenko
+@version: 1.0.0
+"""
 from LZW import *
 import argparse
 import os

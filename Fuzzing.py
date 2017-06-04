@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-@author: Thomas DUBIER
 Script python pour Fuzzer les fonctions de compression/décompression
 Si le script crash alors il y a des erreurs à corriger.
 Les exceptions attrapées sont celles spécifiées dans la documentation des fonctions
-compresser/decompresser
+compresser/decompresser.
+@author: Thomas Dubier
+@author: Pol Kramarenko
+@version: 1.0.0
 """
 
 from LZW import *
@@ -52,5 +54,10 @@ def test_uncompress_only(buffer):
         pass
 
 
-test_compress_decompress()
-test_uncompress_only()
+if __name__ == '__main__':
+    try:
+        test_compress_decompress()
+        test_uncompress_only()
+    except AssertionError:
+        print("[-] test failed")
+    print("[+] test pass")

@@ -4,8 +4,9 @@
 """
 Module pour gérer la compression et la décompression en
 utilisant l'algorithme LZW.
-@author : Tomtombinary
-@version : 1.0.0
+@author: Thomas Dubier
+@author: Pol Kramarenko
+@version: 1.0.0
 """
 
 from BitStream import *
@@ -17,8 +18,9 @@ def compress(buffer):
     Compresse un fichier en utilisant l'algorithme LZW.
     La fonction calcule automatiquement le nombre de bits nécessaires pour encoder les codes,
     ce nombre est encodé sur 4 octets au début du tampon de sortie.
-    Les données compressées peuvent être plus lourd que les données originales,
-    s'il y a peu d'octets qui se répètent.
+    Les données compressées peuvent être plus lourd que les données originales.
+    Plus l'entropie du fichier est grande plus la compression est médiocre, voire
+    supérieur au fichier originale.
     @param buffer: donnée à compresser de type bytes
     @exception: TypeError : si l'argument n'a pas le bon type
     @exception: BufferError : si le buffer ne peut pas être compressé
@@ -72,6 +74,7 @@ def uncompress(buffer):
     @exception TypeError : si l'argument n'est pas un objet de type bytes
     @exception BufferError : si les données sont malformées, c'est-à-dire :
                 - si le premier code n'est pas un caractère
+                - si le header n'est pas correct
     @exception BitStreamErrorEOF :
                 - si le buffer est vide
     @return: un buffer de type bytes qui contient  les données décompressées.
@@ -83,8 +86,13 @@ def uncompress(buffer):
     if len(buffer) <= 4:
         raise BufferError("invalid header")
 
+    # Nombre de bits pour décoder les codes
     nbits = int.from_bytes(buffer[0:4], 'little')
-    decoder = BitStream(nbits)
+    try:
+        decoder = BitStream(nbits)
+    except BitStreamUnsupportedParameter:
+        raise BufferError("invalid header")
+
     decoder.from_bytes(buffer[4:])
 
     size = decoder.size_in_code()

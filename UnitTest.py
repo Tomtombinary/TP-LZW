@@ -1,5 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+"""
+Fichier de tests unitaire
+@author: Thomas Dubier
+@author: Pol Kramarenko
+@version: 1.0.0
+"""
+
 import unittest
 from LZW import *
 from BitStream import *
@@ -150,7 +158,7 @@ class MyTestCase(unittest.TestCase):
         except Exception as e:
             exc = e
 
-        self.assertEquals(isinstance(exc, BitStreamErrorEOF), True)
+        self.assertEqual(isinstance(exc, BitStreamErrorEOF), True)
 
     def test_bitstream_write_codes(self):
         """

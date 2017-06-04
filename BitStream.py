@@ -3,8 +3,9 @@
 
 """
 Module pour gèrer un flux de données encodé sur n bits
-@author : Tomtombinary
-@version : 1.0.0
+@author: Thomas Dubier
+@author: Pol Kramarenko
+@version: 1.0.0
 """
 
 from math import *
@@ -50,6 +51,9 @@ class BitStreamUnsupportedParameter(BitStreamError):
 
 
 class BitStream:
+    """
+    Classe pour représenter un flux de bits
+    """
     def __init__(self, nbits):
         """
         Initialise un flux de bit
